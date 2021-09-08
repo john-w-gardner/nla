@@ -1,0 +1,11 @@
+C library of matrix operations and linear system solvers. 
+
+An m \times n matrix in this world is just a m*n-length array of doubles using row-major order. 
+For now see source code for function descriptions. 
+
+matops.c: basic matrix operations
+mat.h: header file
+qrGS1.c: Compute QR factorization via Gram-Schimdt
+qrGS2.c: Compute QR factorization using modified (more stable) Gram-Schmidt
+solver.c: Solve linear system using QR factorization
+test.solver.c: Example solving a linear system
