@@ -63,7 +63,7 @@ void printmat(double A[], int m, int n)
   int i,j;
   for (i=0; i<m; i++) {
     for (j=0; j<n; j++) {
-      printf("%.15lf ", A[i*n+j]);
+      printf("%.05lf ", A[i*n+j]);
     }
     printf("\n");
   }
