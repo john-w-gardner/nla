@@ -17,7 +17,7 @@ v should well approximate x.
 int main()
 {
   // ints & sizes
-  int n = 20;
+  int n = 10;
   int size = n*n;
   int i, j;
 
@@ -35,57 +35,55 @@ int main()
     }
 
   //vectors 
-  double u[n], v[n], x[n], b[n], y[n];
+  double x[n], b[n], Ax[n];
   for (i=0; i<n; i++)
     {
-      x[i] = (double)rand()/RAND_MAX*10.0-5.0;
-      v[i] = b[i] = y[i] = u[i] = 0.0;
+      b[i] = (double)rand()/RAND_MAX*10.0-5.0;
+      x[i] = Ax[i] = 0.0;
     }
 
   
   printf("A:\n");
   printmat(A,n,n);
-  printf("x:\n");
-  printmat(x,n,1);
-  
-  matvec(A, n, n, x, n, &b);
-  printf("Ax:\n");
+  printf("b:\n");
   printmat(b,n,1);
-
+  
   // QR decomposition
-  qrGS1(A, n, n, &Q, &R);
+  qrGS2(A, n, n, &Q, &R);
   printf("Q:\n");
   printmat(Q,n,n);
   printf("R:\n");
   printmat(R,n,n);
 
-  //check
-  printf("QR:\n");
+  // check
+  printf("Check A=QR:\n");
   matmat(Q, n, n, R, n, n, &A2, n, n);
   printmat(A2, n, n);
   scaleVec(&A2, -1.0, size);  
   addVec(&A2, A, size);
-  printf("A-QR:\n");
+  printf("Check A-QR=0:\n");
   printmat(A2,n,n);
-  printf("printMax on A-QR:\n");
-  printMax(A2, size);
   printf("\n");
 
-  // Q'b = y
-  transpose1(Q, n, n, &Qt);
-  matvec(Qt, n, n, b, n, &y);
-
-  // backsolve
-  backsub(R, n, y, &v);
+  // solve 
+  // NOTE: qrSolve computes Q and R separately from the rest of this exercise
+  qrSolve(A, n, &x, b);
 
   // check
-  printf("solution:\n");
-  printmat(v, n, 1);
+  printf("Resultant x:\n");
+  printmat(x, n, 1);
 
-  scaleVec(&x, -1.0, n);
-  addVec(&x, v, n);
-  printf("printMax on v-x:\n");
-  printMax(x, n);
+  printf("Ax:\n");
+  matvec(A, n, n, x, n, &Ax);
+  printmat(Ax, n, 1);
+
+  printf("Ax - b:\n");
+  scaleVec(&b, -1.0, n);
+  addVec(&Ax, b, n);
+  printmat(Ax, n, 1);
+
+  printf("printMax on Ax-b:\n");
+  printMax(Ax, n);
   printf("\n");
 
   /*
