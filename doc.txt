@@ -1,0 +1,115 @@
+Descriptions of functions 
+
+matops.c:
+
+void matmat(double A[], int am, int an,
+            double B[], int bm, int bn, 
+            double (*C)[], int cm, int cn)
+
+Multiply matrices A (size am by an) and B (size bm by bn) and put result in matrix C (size cm by cn). 
+
+- 
+
+void matvec(double A[], int am, int an,
+            double x[], int xn,
+            double (*b)[])
+
+Matrix times vector, like matmat, but with fewer dimensions to be specified. 
+
+- 
+
+void printmat(double A[], int m, int n)
+
+Print matrix, for testing purposes. 
+
+-
+
+double dotprod(double x[], double y[], int n)
+
+Dot product between vectors x and y. 
+
+-
+
+double eucnorm(double x[], int n)
+
+Euclidean 2-norm, i.e. ||x||_2 i.e. \sqrt{\sum x_i}.
+
+-
+
+
+double eucmetric(double x[], double y[], int n)
+
+euclidean metric, i.e. ||x-y||_2
+
+-
+
+void addVec(double (*u)[], double v[], int n)
+
+Add n-length vectors u and v, store result in u (overwrite).
+
+-
+
+void scaleVec(double (*x)[], double a, int n)
+
+Scale n-length vector x by a. 
+
+-
+
+void updateCol(double (*A)[], int m, int n, int i, double v[])
+
+insert length m vector v into column i of matrix A 
+
+-
+
+void transpose1(double A[], int m, int n, double (*At)[])
+
+Transpose matrix A, store in At.
+
+- 
+
+double extractEntry(double A[], int m, int n, int i, int j)
+
+Extract (return) the row i, column j entry from matrix A. 
+
+-
+
+void extractColumn(double A[], int m, int n, int j, double (*v)[])
+
+Extract column j of A, store in vector v. 
+
+-
+
+void updateEntry(double x, double (*A)[], int m, int n, int i, int j)
+
+Write value of x into A at row i, column j. 
+
+-
+
+double printMax(double v[], int n)
+
+Print maximum entry of vector
+
+---------------------
+
+qrSolve.c:
+
+void qrSolve(double A[], int n, double (*x)[], double b[])
+
+Solves n by n linear system Ax=b via (modified) Gram Schmidt QR factorization. 
+Stores result in x.
+
+-
+
+void backsub(double A[], int n, double b[], double (*x)[])
+
+Given n \times n upper triangular matrix A and RHS b, solve Ax=b for x.
+Store result in x. 
+
+-
+
+void qrGS2(double A[], int m, int n, double (*Q)[], double (*R)[]) 
+
+Compute QR factorization A=QR, where A is m by n, Q is m by n, R is n by n. 
+
+-
+
