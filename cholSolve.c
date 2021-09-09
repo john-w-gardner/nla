@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "mat.h"
-
+#include <math.h>
 
 /* Solve linear system via Cholesky Factorization
    see TB p. 175-176
@@ -28,8 +28,6 @@
 void cholSolve(double A[], int n, double (*x)[], double b[])
 {
   int size = n*n;
-  double Q[size];
-  double Qt[size];
   double R[size];
   double Rt[size];
   double y[n];
@@ -40,15 +38,21 @@ void cholSolve(double A[], int n, double (*x)[], double b[])
     }
 
   // cholesky decomp
-  cholFac(A, m, &R);
-  
+  cholFac(A, n, &R);
+  printf("R after cholfac:\n");
+  printmat(R,n,n);
+
   // solve R'y = b via back substitution
   // opportunity for speedup here, see note (2i)
-  transpose1(R,m,m,Rt);
-  backsub(R, m, b, &y);
+  transpose1(R, n, n, &Rt);
+  forwardsub(Rt, n, b, &y);
+  printf("y after backsub:\n");
+  printmat(y,n,1);
   
   // solve Rx = y via forward substitution 
-  forwardsub(R, m, y, &x);
+  backsub(R, n, y, x);
+  printf("x after forwardsub:\n");
+  printmat(*x,n,1);
 }
 
 
@@ -111,14 +115,14 @@ void forwardsub(double A[], int n, double b[], double (*x)[])
 // to be ignored by solvers downstream. see note 1i
 void cholFac(double A[], int m, double (*R)[]) 
 {
-  int k, j;
+  int i, k, j;
   double Rkk, scale, tmp;  
   Rkk = scale = 0.0;
   double Rj[m], Rkm[m], Rkj[m];
   //  double vi[m], vj[m], qi[m], aj[m], qtemp[m];
   for (k=0;k<m;k++)
     {
-      Rjm[k] = Rkm[k] = Rkj[k] = 0.0;
+      Rj[k] = Rkm[k] = Rkj[k] = 0.0;
     }
 
   // set R = A
@@ -127,6 +131,8 @@ void cholFac(double A[], int m, double (*R)[])
       (*R)[k] = A[k];
     }
 
+  printf("matrix R before cholfac loop(s):\n");
+  printmat(*R,m,m);
   // go
   for (k=0; k<m; k++)
     {
@@ -139,16 +145,26 @@ void cholFac(double A[], int m, double (*R)[])
           scale = -extractEntry(*R, m, m, k, j)/extractEntry(*R, m, m, k, k);
           scaleVec(&Rkj, scale, m);
           addVec(&Rj, Rkj, m);
+          printf("Rj at iteration k=%d j=%d:\n", k,j);
+          printmat(Rj,1,m);
           updateRow(R,m,m,j,Rj);
         }
-      scale = 1/sqrt(extractEntry(*R,m,m,k,k));
-      extractColumn(*R,m,m,k,Rkm);
-      for (i=k; i<m; i++) // this column is not exempt from concern in (1i)
+      Rkk = extractEntry(*R,m,m,k,k);
+      printf("Rkk at iter k=%d: %.15lf \n",k, Rkk);
+      scale = 1.0/sqrt(Rkk);
+      printf("scale at iter k=%d: %.15lf \n",k, scale);
+     
+      extractRow(*R,m,m,k,&Rkm);
+      
+      /* // need to avoid opposite diagonal entries?
+      for (i=k; i<m; i++) 
         {
           tmp = Rkm[i]*scale;
           Rkm[i] = tmp;
         }
-      updateCol(R,m,m,k,Rkm);
+      */
+      scaleVec(&Rkm, scale, m);
+      updateRow(R,m,m,k,Rkm);
     }
 }
 
