@@ -144,6 +144,16 @@ void updateCol(double (*A)[], int m, int n, int i, double v[])
     }
 }
 
+/* insert vector v into row j of matrix A stored in row-major order */
+void updateRow(double (*A)[], int m, int n, int j, double v[])
+{
+  int k;
+  for (k=0; k<n; k++)
+    {
+      (*A)[(j*m)+k] = v[k];
+    }
+}
+
 /* transpose: At must be pointer to m*n-length array */
 /* result: pointer to matrix size n \times m in row-major order */
 void transpose1(double A[], int m, int n, double (*At)[])
@@ -195,9 +205,16 @@ void extractColumn(double A[], int m, int n, int j, double (*v)[])
     (*v)[i] = extractEntry(A, m, n, i, j);
 }
 
-/* extract the row i, col j entry from matrix stored as vector 
- i, j indexed from zero 
-*/
+/* put row j of A into vector v */
+void extractRow(double A[], int m, int n, int j, double (*v)[])
+{
+  int i;
+
+  for (i=0; i<n; i++)
+    (*v)[i] = extractEntry(A, m, n, j, i);
+}
+
+// insert x into row i, col j entry in matrix A
 void updateEntry(double x, double (*A)[], int m, int n, int i, int j)
 {
   if (j<n && i<m)
