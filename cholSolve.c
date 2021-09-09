@@ -116,7 +116,7 @@ void forwardsub(double A[], int n, double b[], double (*x)[])
 void cholFac(double A[], int m, double (*R)[]) 
 {
   int i, k, j;
-  double Rkk, scale, tmp;  
+  double Rji, Rki, Rkk, scale, tmp;  
   Rkk = scale = 0.0;
   double Rj[m], Rkm[m], Rkj[m];
   //  double vi[m], vj[m], qi[m], aj[m], qtemp[m];
@@ -140,31 +140,27 @@ void cholFac(double A[], int m, double (*R)[])
         {
           // R_j,j:m = R_j,j:m - R_k,j:m R'_kj/R_kk
           // see note (1i)
-          extractRow(*R, m, m, j, &Rj);
-          extractRow(*R, m, m, k, &Rkj);
           scale = -extractEntry(*R, m, m, k, j)/extractEntry(*R, m, m, k, k);
-          scaleVec(&Rkj, scale, m);
-          addVec(&Rj, Rkj, m);
-          printf("Rj at iteration k=%d j=%d:\n", k,j);
-          printmat(Rj,1,m);
-          updateRow(R,m,m,j,Rj);
+          for (i=j; i<m; i++)
+            {
+              Rji = extractEntry(*R,m,m,j,i);
+              Rki = extractEntry(*R,m,m,k,i);
+              Rji = Rji + scale*Rki;
+              updateEntry(Rji, R, m, m, j, i);
+            }
         }
       Rkk = extractEntry(*R,m,m,k,k);
       printf("Rkk at iter k=%d: %.15lf \n",k, Rkk);
       scale = 1.0/sqrt(Rkk);
       printf("scale at iter k=%d: %.15lf \n",k, scale);
-     
-      extractRow(*R,m,m,k,&Rkm);
-      
-      /* // need to avoid opposite diagonal entries?
+
+      // R_k,k:m = R_k,k:m / sqrt(R_kk)     
       for (i=k; i<m; i++) 
         {
-          tmp = Rkm[i]*scale;
-          Rkm[i] = tmp;
+          Rki = extractEntry(*R,m,m,k,i);
+          Rki = Rki*scale;
+          updateEntry(Rki,R,m,m,k,i);
         }
-      */
-      scaleVec(&Rkm, scale, m);
-      updateRow(R,m,m,k,Rkm);
     }
 }
 
@@ -181,12 +177,18 @@ That way we can more easily access each column.
 
 
 /* notes
-(1i) The text calls for using vectors from principal submatrices, 
-but we can get away with using the full vectors, 
-and ignoring the garbage in the entries outside of the principal submatrix, 
-since we assume the matrix is upper triangular. 
+(1i) The text uses matlab style slicing which I don't really have so I use an 
+extra loop in i. 
+The first version actually used extract/updateRow which was probably faster, 
+better etc but does weird things to the subdiagonal entries that annoyed me. 
+
+Also, the algorithm in text assumes A is upper triangular, 
+I don't zero out sub-diagonal entries. 
+Downstream uses of R may have to remember that it contains garbage.
+
 If I was really diligent I would use a scheme that uses arrays that fill 
 only half the matrix in question to avoid issues like this. 
+
 
 (2i) Rather than transpose R here, 
 we could write a "backwards back solver" that solves a lower triangular system 
