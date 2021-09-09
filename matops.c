@@ -123,7 +123,7 @@ void addVec(double (*u)[], double v[], int n)
     }
 }
 
-/* scale vector in R^n */
+/* scale vector in R^n by a */
 void scaleVec(double (*x)[], double a, int n)
 {
   int i;
