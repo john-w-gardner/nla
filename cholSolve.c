@@ -31,19 +31,24 @@ void cholSolve(double A[], int n, double (*x)[], double b[])
   double Q[size];
   double Qt[size];
   double R[size];
+  double Rt[size];
   double y[n];
   int i;
   for (i=0; i<size; i++)
     {
-      R[i] = 0;
+      R[i] = Rt[i] = 0;
     }
 
   // cholesky decomp
-
+  cholFac(A, m, &R);
+  
   // solve R'y = b via back substitution
-
+  // opportunity for speedup here, see note (2i)
+  transpose1(R,m,m,Rt);
+  backsub(R, m, b, &y);
+  
   // solve Rx = y via forward substitution 
-
+  forwardsub(R, m, y, &x);
 }
 
 
@@ -68,24 +73,24 @@ void backsub(double A[], int n, double b[], double (*x)[])
           (*x)[i] = xaccum;
         }
       else 
-        printf("singular R: zero entry on diagonal\n");
+        printf("backsub:\nsingular R: zero entry on diagonal\n");
     }
 }
 
 
 
 // given n \times n lower triangular matrix A and RHS b, solve Ax=b for x
-void forwardSub(double A[], int n, double b[], double (*x)[])
-/*
+void forwardsub(double A[], int n, double b[], double (*x)[])
+
 {
   int i, j;
   double xaccum, rij;
   xaccum = rij = 0;
 
-  for (i=n-1; i >= 0; i--)
+  for (i=0; i < n; i++)
     {
       xaccum = b[i];
-      for (j=n-1; j > i; j--)
+      for (j=0; j<i; j++)
         {
           rij = extractEntry(A, n, n, i, j);
           xaccum -= rij*(*x)[j];
@@ -96,56 +101,55 @@ void forwardSub(double A[], int n, double b[], double (*x)[])
           (*x)[i] = xaccum;
         }
       else 
-        printf("singular R: zero entry on diagonal\n");
+        printf("forwardsub:\nsingular input matrix: zero entry on diagonal\n");
     }
-*/
 }
 
 
 // compute lower triangular R via Cholesky Factorization
-void cholFac(double A[], int m, int n, double (*R)[]) 
+// Actually R will have garbage in the upper triangular part, 
+// to be ignored by solvers downstream. see note 1i
+void cholFac(double A[], int m, double (*R)[]) 
 {
-  int i, j;
-  double Rkk = 0.0;  
-  double vi[m], vj[m], qi[m], aj[m], qtemp[m];
-  for (i=0;i<m;i++)
+  int k, j;
+  double Rkk, scale, tmp;  
+  Rkk = scale = 0.0;
+  double Rj[m], Rkm[m], Rkj[m];
+  //  double vi[m], vj[m], qi[m], aj[m], qtemp[m];
+  for (k=0;k<m;k++)
     {
-      vi[i] = qi[i] = vj[i] = qtemp[i] = 0;
+      Rjm[k] = Rkm[k] = Rkj[k] = 0.0;
     }
 
-  // set Q = A
-  for (i=0; i<m*n; i++)
+  // set R = A
+  for (k=0; k<m*m; k++)
     {
-      (*Q)[i] = A[i];
+      (*R)[k] = A[k];
     }
 
-  for (i=0; i<n; i++)
+  // go
+  for (k=0; k<m; k++)
     {
-      // r_ii = ||v_i||
-      extractColumn(*Q, m, n, i, &vi);
-      rij = eucnorm(vi, m);
-      updateEntry(rij, R, n, n, i, i);
-
-      // q_i = v_i/r_ii
-      updateCol(&qi, m, 1, 0, vi);
-      scaleVec(&qi, 1/rij, m);
-      updateCol(Q, m, n, i, qi);
-
-      for (j=i+1; j<n; j++)
+      for (j=k+1; j<m; j++)
         {
-          // rij = q_i'v_j
-          extractColumn(*Q, m, n, j, &vj);
-          rij = dotprod(qi, vj, m);
-          updateEntry(rij, R, n, n, i, j);
-
-          // v_j = v_j - r_{ij}q_i
-          updateCol(&qtemp, m, 1, 0, qi); // need to keep q_i as is 
-          scaleVec(&qtemp, -1.0*rij, m);
-          addVec(&vj, qtemp, m);
-          updateCol(Q, m, n, j, vj);
+          // R_j,j:m = R_j,j:m - R_k,j:m R'_kj/R_kk
+          // see note (1i)
+          extractRow(*R, m, m, j, &Rj);
+          extractRow(*R, m, m, k, &Rkj);
+          scale = -extractEntry(*R, m, m, k, j)/extractEntry(*R, m, m, k, k);
+          scaleVec(&Rkj, scale, m);
+          addVec(&Rj, Rkj, m);
+          updateRow(R,m,m,j,Rj);
         }
+      scale = 1/sqrt(extractEntry(*R,m,m,k,k));
+      extractColumn(*R,m,m,k,Rkm);
+      for (i=k; i<m; i++) // this column is not exempt from concern in (1i)
+        {
+          tmp = Rkm[i]*scale;
+          Rkm[i] = tmp;
+        }
+      updateCol(R,m,m,k,Rkm);
     }
-
 }
 
 
@@ -158,3 +162,19 @@ Pass in arrays of pointers to arrays rather than arrays of doubles.
 Each sub-array will then be a column. 
 That way we can more easily access each column. 
   */
+
+
+/* notes
+(1i) The text calls for using vectors from principal submatrices, 
+but we can get away with using the full vectors, 
+and ignoring the garbage in the entries outside of the principal submatrix, 
+since we assume the matrix is upper triangular. 
+If I was really diligent I would use a scheme that uses arrays that fill 
+only half the matrix in question to avoid issues like this. 
+
+(2i) Rather than transpose R here, 
+we could write a "backwards back solver" that solves a lower triangular system 
+with an upper triangular matrix
+*/
+
+
