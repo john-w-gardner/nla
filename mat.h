@@ -29,3 +29,8 @@ void forwardsub(double A[], int n, double b[], double (*x)[]);
 void cholSolve(double A[], int n, double (*x)[], double b[]);
 void qrSolve(double A[], int n, double (*x)[], double b[]);
 double testSolve(double A[], int n, double x[], double b[]);
+void submat(double A[], int m, int n, int i1, int i2, int j1, int j2,double (*As)[]);
+int sign(double x);
+void insertSubmat(double (*A)[], int m, int n, int i1, int i2, int j1, int j2, 
+                  double As[]);
+void qrHH(double A[], int m, int n, double (*Q)[], double (*R)[]);

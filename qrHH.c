@@ -37,25 +37,25 @@ void qrHH(double A[], int m, int n, double (*Q)[], double (*R)[])
         {
           if (i == j) 
             { 
-              printf("updating Q with 1 on diagonal.. i=%d j=%d\n",i,j);
+              //printf("updating Q with 1 on diagonal.. i=%d j=%d\n",i,j);
               updateEntry(1.0, Q, m, m, i, j); 
               //printmat(*Q,m,m);
             }
           else 
             { 
-              printf("updating Q off diagonal.. i=%d j=%d\n",i,j);
+              //printf("updating Q off diagonal.. i=%d j=%d\n",i,j);
               updateEntry(0.0, Q, m, m, i, j); 
               //printmat(*Q,m,m);
             }
-          printf("A:\n");
+          //printf("A:\n");
           //printmat(A,m,n);
         }
     }
-  printf("printmat Q then R then A in qrHH:\n");
+  //printf("printmat Q then R then A in qrHH:\n");
   //printmat(*Q,m,m);
-  printf("R:\n");
+  //printf("R:\n");
   //printmat(*R,m,n);
-  printf("A:\n");
+  //printf("A:\n");
   //printmat(A,m,n);
   
   // construct R
@@ -67,7 +67,7 @@ void qrHH(double A[], int m, int n, double (*Q)[], double (*R)[])
       double Vtmp[(m-k)*(n-k)];
 
       // x = A_{k:m, k}
-      printf("inside qrHH construction of R.. k=%d\n",k);
+      //printf("inside qrHH construction of R.. k=%d\n",k);
       submat(*R, m,n,k,m,k,k+1,&v);
       /*printf("A:\n");
       //printmat(A,m,n);
@@ -84,23 +84,23 @@ void qrHH(double A[], int m, int n, double (*Q)[], double (*R)[])
       vn = eucnorm(v,m-k);
       if (vn < tolvn) {printf("WARNING: very small ||v_n||: %f\n", vn);}
       scaleVec(&v, 1.0/vn, m-k);
-      printf("v_k/norm(v_k):\n");
+      //printf("v_k/norm(v_k):\n");
       //printmat(v,m-k,1);
 
       // A_{k:m, k:n} = A_{k:m, k:n} - 2v_k(v'_k A_{k:m, k:n})
       submat(*R,m,n,k,m,k,n,&Atmp);
-      printf("Atmp:\n");
+      //printf("Atmp:\n");
       //printmat(Atmp,m-k,n-k);
       // v'A
       double vtmp[n-k];
       //printf("first matmat:\n");
       matmat(v,1,m-k,Atmp,m-k,n-k,&vtmp,1,n-k);
-      printf("vtmp after first matmat:\n");
+      //printf("vtmp after first matmat:\n");
       //printmat(vtmp,1,n-k);
       // vv'A
       
       matmat(v,m-k,1,vtmp,1,n-k,&Vtmp,m-k,n-k);
-      printf("Vtmp after second matmat:\n");
+      //printf("Vtmp after second matmat:\n");
       //printmat(Vtmp,m-k,n-k);
       // A - 2vv'A
       scaleVec(&Vtmp,-2.0,(m-k)*(n-k));
@@ -110,10 +110,10 @@ void qrHH(double A[], int m, int n, double (*Q)[], double (*R)[])
       insertSubmat(R,m,n,k,m,k,n,Atmp);
       // save V
       insertSubmat(&V,m,n,k,m,k,k+1,v);
-      printf("end of %d-th loop.. R:\n",k);
+      //printf("end of %d-th loop.. R:\n",k);
       //printmat(*R,m,n);
     }
-  printf("R completed, here's V:\n");
+  //printf("R completed, here's V:\n");
   //printmat(V,m,n);
   // construct Q
   for (k=n-1; k>=0; k--)
@@ -124,32 +124,32 @@ void qrHH(double A[], int m, int n, double (*Q)[], double (*R)[])
       for (i=0; i<m; i++)
         {
           submat(V,m,n,k,m,k,k+1,&v);
-          printf("v in construct Q k=%d, i=%d\n",k,i);
+          //printf("v in construct Q k=%d, i=%d\n",k,i);
           //printmat(v,m-k,1);
 
           // e_i_k:m = e_i_k:m - 2v_k(v'_k e_i_k:m)
           double e[m-k];
           submat(*Q,m,m,k,m,i,i+1,&e);
-          printf("e:\n");
+          //printf("e:\n");
           //printmat(e,m-k,1);
           // v'e
           matmat(v,1,m-k,e,m-k,1,&vtmp,1,1);
           vn = vtmp[0]; //reusing vn its just a float
           // -2vv'e
           scaleVec(&v,-2.0*vn,m-k);
-          printf("v after all calculations:\n");
+          //printf("v after all calculations:\n");
           //printmat(v,m-k,1);
 
           // e - 2vv'e
           addVec(&e, v, m-k);
-          printf("e after all calculations:\n");
+          //printf("e after all calculations:\n");
           //printmat(e,m-k,1);
 
           // write into Q
           insertSubmat(Q,m,m,k,m,i,i+1,e);
         }
     }
-  printf("done.. Q:\n");
+  //printf("done.. Q:\n");
   //printmat(*Q,m,m);
   
 }

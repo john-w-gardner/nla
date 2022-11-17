@@ -10,7 +10,7 @@ void matmat(double A[], int am, int an,
             double (*C)[], int cm, int cn)
 {
   int i,j,k;
-
+  double accum;
   // check resultant matrix size
   if (cm != am || cn != bn) {
     printf("Error: invalid size of resultant matrix\n");
@@ -26,10 +26,16 @@ void matmat(double A[], int am, int an,
   // go
   for (i=0; i<am; i++) {
     for(j=0; j<bn; j++) {
+      accum = 0;
       for(k=0; k<an; k++) {
-        (*C)[(i*cn)+j] += A[(i*an)+k]*B[(k*bn)+j];
+        accum += A[(i*an)+k]*B[(k*bn)+j];
+        if (isnan(accum)) 
+          { 
+            printf("nan at i=%d, j=%d\n", i,j);
+          }
         //printf("%lf ", (*C)[(i*cn)+j]);
       }
+      (*C)[(i*cn)+j] = accum;
       //printf("\n");
     }
     //printf("\n");
@@ -67,6 +73,7 @@ void printmat(double A[], int m, int n)
     }
     printf("\n");
   }
+  printf("\n");
 }
 
 /* dot product */
@@ -191,7 +198,7 @@ double extractEntry(double A[], int m, int n, int i, int j)
   if (j<n && i<m)
     return A[n*i+j];
   else
-    printf("extractEntry: invalid entry i: %d  j: %d", i, j);
+    printf("extractEntry: invalid entry i: %d  j: %d\n", i, j);
   return 0;
 }
 
@@ -220,7 +227,7 @@ void updateEntry(double x, double (*A)[], int m, int n, int i, int j)
   if (j<n && i<m)
     (*A)[n*i+j] = x;
   else
-    printf("updateEntry: invalid entry i: %d  j: %d", i, j);
+    printf("updateEntry: invalid entry i: %d  j: %d\n", i, j);
 }
 
 // print maximum entry of vector
@@ -243,4 +250,69 @@ double printMax(double v[], int n)
   printf("max value: %.15lf location: %d\n", max, loc);
   return max;
 }
+
+// sign of double
+int sign(double x)
+{
+  if (x < 0)
+    {
+      return -1;
+    }
+  else
+    return 1;
+}
+
+// extract submatrix of A, store in As
+// include row i1 up to but not including i2, 
+// and column j1 up to but not including j2
+void submat(double A[], int m, int n, int i1, int i2, int j1, int j2, 
+            double (*As)[])
+{
+  int i, j, k, l;
+  int Aslen = i2 - i1;
+  int Aswid = j2 - j1;
+  k = l = 0;
+
+  //printf("%d %d\n", Aslen, Aswid);
+  // WARNING: no size check for As..
+
+  for (i=i1; i<i2; i++)
+    {
+      for (j=j1; j<j2; j++)
+        {
+          // printf("k,l inside submat loop: %d %d\n", k,l);
+          updateEntry(extractEntry(A,m,n,i,j), As, Aslen,Aswid,k,l);
+          l++;
+        }
+      k++;
+      l = 0;
+    }
+}
+
+
+// insert matrix As into bigger matrix A
+void insertSubmat(double (*A)[], int m, int n, int i1, int i2, int j1, int j2, 
+            double As[])
+{
+  int i, j, k, l;
+  int Aslen = i2 - i1;
+  int Aswid = j2 - j1;
+  k = l = 0;
+
+  //printf("Aslen: %d Aswid: %d\n", Aslen, Aswid);
+  // WARNING: no size check for As..
+
+  for (i=i1; i<i2; i++)
+    {
+      for (j=j1; j<j2; j++)
+        {
+          //printf("k,l inside submat loop: %d %d\n", k,l);
+          updateEntry(extractEntry(As,Aslen,Aswid,k,l), A,m,n,i,j);
+          l++;
+        }
+      k++;
+      l = 0;
+    }
+}
+
 
