@@ -79,6 +79,12 @@ Extract column j of A, store in vector v.
 
 -
 
+void extractRow(double A[], int m, int n, int j, double (*v)[])
+
+Extract row j of A, store in vector v. 
+
+-
+
 void updateEntry(double x, double (*A)[], int m, int n, int i, int j)
 
 Write value of x into A at row i, column j. 
@@ -88,6 +94,29 @@ Write value of x into A at row i, column j.
 double printMax(double v[], int n)
 
 Print maximum entry of vector
+
+-
+
+void sign(double x)
+
+returns the sign of x. 
+-1 if x < 1, 1 if x >= 1
+
+-
+
+void submat(double A[], int m, int n, int i1, int i2, int j1, int j2,double (*As)[])
+
+Matrix slicing. 
+Extract rows i1 up to but not including i2, and columns j1 up to but not including j2.
+Insert into As. 
+
+-
+
+void insertSubmat(double (*A)[], int m, int n, int i1, int i2, int j1, int j2, 
+                  double As[]);
+
+Insert (i2-i1) by (j2-j1) matrix As into A. 
+First column of As to replace the i1-th column of A, first row with j1. 
 
 ---------------------
 
@@ -107,9 +136,31 @@ Store result in x.
 
 -
 
+void qrGS1(double A[], int m, int n, double (*Q)[], double (*R)[])
+
+Compute QR factorization A=QR, where A is m by n, Q is m by n, R is n by n. 
+Uses classical Gram-Schmidt
+
+-
+
 void qrGS2(double A[], int m, int n, double (*Q)[], double (*R)[]) 
 
 Compute QR factorization A=QR, where A is m by n, Q is m by n, R is n by n. 
+Uses modified Gram-Schmidt for improved numerical stability
+
+-
+
+void cholFac(double A[], int m, double (*R)[])
+
+Given symmetric positive definite matrix A, 
+compute cholesky factorization A=R'R
+
+-
+
+void qrHH(double A[], int m, int n, double (*Q)[], double (*R)[]);
+
+full QR factorization via Householder reflectors. 
+Q must have size m \times m and R must have size m \times n.
 
 -
 
