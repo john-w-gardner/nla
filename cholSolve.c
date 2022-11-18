@@ -39,20 +39,20 @@ void cholSolve(double A[], int n, double (*x)[], double b[])
 
   // cholesky decomp
   cholFac(A, n, &R);
-  printf("R after cholfac:\n");
-  printmat(R,n,n);
+  // printf("R after cholfac:\n");
+  // printmat(R,n,n);
 
   // solve R'y = b via back substitution
   // opportunity for speedup here, see note (2i)
   transpose1(R, n, n, &Rt);
   forwardsub(Rt, n, b, &y);
-  printf("y after backsub:\n");
-  printmat(y,n,1);
+  // printf("y after backsub:\n");
+  // printmat(y,n,1);
   
   // solve Rx = y via forward substitution 
   backsub(R, n, y, x);
-  printf("x after forwardsub:\n");
-  printmat(*x,n,1);
+  // printf("x after forwardsub:\n");
+  // printmat(*x,n,1);
 }
 
 
@@ -131,8 +131,8 @@ void cholFac(double A[], int m, double (*R)[])
       (*R)[k] = A[k];
     }
 
-  printf("matrix R before cholfac loop(s):\n");
-  printmat(*R,m,m);
+  // printf("matrix R before cholfac loop(s):\n");
+  // printmat(*R,m,m);
   // go
   for (k=0; k<m; k++)
     {
@@ -150,9 +150,9 @@ void cholFac(double A[], int m, double (*R)[])
             }
         }
       Rkk = extractEntry(*R,m,m,k,k);
-      printf("Rkk at iter k=%d: %.15lf \n",k, Rkk);
+      // printf("Rkk at iter k=%d: %.15lf \n",k, Rkk);
       scale = 1.0/sqrt(Rkk);
-      printf("scale at iter k=%d: %.15lf \n",k, scale);
+      // printf("scale at iter k=%d: %.15lf \n",k, scale);
 
       // R_k,k:m = R_k,k:m / sqrt(R_kk)     
       for (i=k; i<m; i++) 
