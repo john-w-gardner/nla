@@ -7,6 +7,8 @@ matops.c: basic matrix operations
 mat.h: header file
 qrGS1.c: Compute QR factorization via Gram-Schimdt
 qrGS2.c: Compute QR factorization using modified (more stable) Gram-Schmidt
-qrSolve.c: Solve linear system using QR factorization
+qrHH.c: Compute QR factorization via Householder reflectors
+gsSolve.c: Solve linear system using Gram-Schmidt QR factorization
+hhSolve.c: Solve linear system using Householder QR factorization
 cholSolve.c: Solve symmetric positive definite linear system using Cholesky factorization
 test.solver.c: Example solving a linear system
