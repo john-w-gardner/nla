@@ -164,3 +164,14 @@ Q must have size m \times m and R must have size m \times n.
 
 -
 
+void gsSolve(double A[], int n, double (*x)[], double b[])
+
+solve n by n linear system Ax = b via Gram Schmidt
+
+- 
+
+void hhSolve(double A[], int n, double (*x)[], double b[])
+
+solve n by n linear system Ax = b via Householder reflectors
+
+-
