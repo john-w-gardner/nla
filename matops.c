@@ -316,3 +316,48 @@ void insertSubmat(double (*A)[], int m, int n, int i1, int i2, int j1, int j2,
 }
 
 
+// test Ax ~ b by returning norm |Ax-b|
+double testSolve(double A[], int n, double x[], double b[])
+{
+  double Ax[n]; // product Ax
+  double nAx; // norm of Ax
+  int i;
+
+  matvec(A, n, n, x, n, &Ax);
+  scaleVec(&Ax, -1.0, n);
+  for (i=0; i<n; i++) 
+    {
+      printf("i: %d -Ax: %.16lf b: %.16lf\n", i, Ax[i], b[i]);
+    }
+  addVec(&Ax, b, n);
+  nAx = eucnorm(Ax, n);
+  printf("|Ax-b|: %.16lf\n", nAx);
+  return nAx;
+}
+
+
+// given n \times n upper triangular matrix A and RHS b, solve Ax=b for x
+void backsub(double A[], int n, double b[], double (*x)[])
+{
+  int i, j;
+  double xaccum, rij;
+  xaccum = rij = 0;
+
+  for (i=n-1; i >= 0; i--)
+    {
+      xaccum = b[i];
+      for (j=n-1; j > i; j--)
+        {
+          rij = extractEntry(A, n, n, i, j);
+          xaccum -= rij*(*x)[j];
+        }
+      if ((rij = extractEntry(A, n, n, i, i)) != 0.0) // replace w ||<tol?
+        {
+          xaccum = xaccum/rij;
+          (*x)[i] = xaccum;
+        }
+      else 
+        printf("singular R: zero entry on diagonal\n");
+    }
+}
+

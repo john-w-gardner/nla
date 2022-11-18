@@ -45,7 +45,7 @@ void qrSolve(double A[], int n, double (*x)[], double b[])
   backsub(R, n, y, x);
 }
 
-
+/*
 // given n \times n upper triangular matrix A and RHS b, solve Ax=b for x
 void backsub(double A[], int n, double b[], double (*x)[])
 {
@@ -70,10 +70,7 @@ void backsub(double A[], int n, double b[], double (*x)[])
         printf("singular R: zero entry on diagonal\n");
     }
 }
-
-#include <stdio.h>
-#include "mat.h"
-
+*/
 /* "modified" Gram-Schmidt orthogonalization for reduced QR
  see TB p.58
  A and Q are m \times n with m >= n,
@@ -82,8 +79,8 @@ void backsub(double A[], int n, double b[], double (*x)[])
 
 /* overwriting v_i-s into A, since A is temporary anyway
    i.e. skip first two lines in Algorithm 8.1
-   
 */   
+   
 void qrGS2(double A[], int m, int n, double (*Q)[], double (*R)[]) 
 {
   int i, j;
@@ -129,7 +126,7 @@ void qrGS2(double A[], int m, int n, double (*Q)[], double (*R)[])
 
 }
 
-
+/*
 // test Ax ~ b by returning norm |Ax-b|
 double testSolve(double A[], int n, double x[], double b[])
 {
@@ -149,7 +146,7 @@ double testSolve(double A[], int n, double x[], double b[])
   return nAx;
 }
 
-
+*/
 
   /* 
 all these extract/update-s might be expensive...
